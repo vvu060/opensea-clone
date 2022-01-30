@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
 import Header from '../../components/Header'
-import NFTImage from '../../components/NFTImage'
+import NFTImage from '../../components/nft/NFTImage'
 
 const style = {
   wrapper: `flex flex-col items-center container-lg text-[#e5e8eb]`,
@@ -37,10 +37,8 @@ const Nft = () => {
     ;(async () => {
       const nfts = await nftModule.getAll()
 
-      const selectedNftArray = nfts.find(
-        (nft) => nft.id === router.query.assetId
-      )
-      setSelectedNft(selectedNftArray)
+      const selectedNftItem = nfts.find((nft) => nft.id === router.query.nftId)
+      setSelectedNft(selectedNftItem)
     })()
   }, [nftModule])
 
@@ -69,7 +67,15 @@ const Nft = () => {
   return (
     <div className="">
       <Header />
-      <NFTImage />
+      <div className={style.wrapper}>
+        <div className={style.container}>
+          <div className={style.topContent}>
+            <div className={style.nftImgContainer}>
+              <NFTImage selectedNft={selectedNft} />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
