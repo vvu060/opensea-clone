@@ -1,4 +1,9 @@
+import { useWeb3 } from '@3rdweb/hooks'
 import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
+import { ThirdwebSDK } from '@3rdweb/sdk'
+
+import { client } from '../../lib/snaityClient'
 
 const style = {
   bannerImageContainer: `h-[20vh] w-screen overflow-hidden flex justify-center items-center`,
@@ -24,6 +29,80 @@ const style = {
 
 const Collection = () => {
   const router = useRouter()
+  const { provider } = useWeb3
+  const { collectionId } = router.query
+  const [collection, setCollection] = useState({})
+  const [nfts, setNfts] = useState([])
+  const [listings, setListings] = useState([])
+  //
+
+  const nftModule = useMemo(() => {
+    if (!provider) return
+
+    const sdk = new ThirdwebSDK(
+      provider.getSigner,
+      'https://eth-rinkeby.alchemyapi.io/v2/kF9WqQJC2A_xzF_dtYfyvc1ISAQ87DwW'
+    )
+
+    return sdk.getNFTModule(collectionId)
+  }, [provider])
+
+  //   get all NFTs in the collection
+  useEffect(() => {
+    if (!nftModule) return
+    ;(async () => {
+      const nfts = await nftModule.getAll()
+      setNfts(nfts)
+    })()
+  }, [nftModule])
+
+  const marketPlaceModule = useMemo(() => {
+    if (!provider) return
+
+    const sdk = new ThirdwebSDK(
+      provider.getSigner,
+      'https://eth-rinkeby.alchemyapi.io/v2/kF9WqQJC2A_xzF_dtYfyvc1ISAQ87DwW'
+    )
+
+    return sdk.getMarketplaceModule(
+      '0xdd67b6d6ce82A34AdCdC6f53893B1F29b3cf6D14'
+    )
+  }, [provider])
+
+  //   get all listings in the collection
+  useEffect(() => {
+    if (!marketPlaceModule) return
+    ;(async () => {
+      const listings = await marketPlaceModule.getAllListings()
+      setListings(listings)
+    })()
+  }, [marketPlaceModule])
+
+  const fetchCollectionData = async (sanityClient = client) => {
+    const query = `*[_type == 'marketItems' && contractAddress == "${collectionId}"]{
+        "imageUrl": profileImage.asset->url,
+        "bannerImageUrl": bannerImage.asset->url,
+        volumeTraded,
+        createdBy,
+        contractAddress,
+        "creator": createdBy->userName,
+        title, 
+        floorPrice,
+        "allOwners": owners[]->,
+        description
+      }`
+
+    const collectionData = await sanityClient.fetch(query)
+
+    console.log({ collectionData })
+
+    // the query returns 1 object inside of an array
+    await setCollection(collectionData[0])
+  }
+
+  useEffect(() => {
+    fetchCollectionData()
+  }, [collectionId])
 
   return <div className=""></div>
 }
