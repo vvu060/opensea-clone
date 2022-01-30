@@ -2,8 +2,13 @@ import { useWeb3 } from '@3rdweb/hooks'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { ThirdwebSDK } from '@3rdweb/sdk'
+import { CgWebsite } from 'react-icons/cg'
+import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai'
+import { HiDotsVertical } from 'react-icons/hi'
 
 import { client } from '../../lib/snaityClient'
+import Header from '../../components/Header'
+import NFTCard from '../../components/NFTCard'
 
 const style = {
   bannerImageContainer: `h-[20vh] w-screen overflow-hidden flex justify-center items-center`,
@@ -29,7 +34,7 @@ const style = {
 
 const Collection = () => {
   const router = useRouter()
-  const { provider } = useWeb3
+  const { provider } = useWeb3()
   const { collectionId } = router.query
   const [collection, setCollection] = useState({})
   const [nfts, setNfts] = useState([])
@@ -40,7 +45,7 @@ const Collection = () => {
     if (!provider) return
 
     const sdk = new ThirdwebSDK(
-      provider.getSigner,
+      provider.getSigner(),
       'https://eth-rinkeby.alchemyapi.io/v2/kF9WqQJC2A_xzF_dtYfyvc1ISAQ87DwW'
     )
 
@@ -60,7 +65,7 @@ const Collection = () => {
     if (!provider) return
 
     const sdk = new ThirdwebSDK(
-      provider.getSigner,
+      provider.getSigner(),
       'https://eth-rinkeby.alchemyapi.io/v2/kF9WqQJC2A_xzF_dtYfyvc1ISAQ87DwW'
     )
 
@@ -94,8 +99,6 @@ const Collection = () => {
 
     const collectionData = await sanityClient.fetch(query)
 
-    console.log({ collectionData })
-
     // the query returns 1 object inside of an array
     await setCollection(collectionData[0])
   }
@@ -104,7 +107,119 @@ const Collection = () => {
     fetchCollectionData()
   }, [collectionId])
 
-  return <div className=""></div>
+  return (
+    <div className="overflow-hidden">
+      <Header />
+      <div className={style.bannerImageContainer}>
+        <img
+          className={style.bannerImage}
+          src={
+            collection?.bannerImageUrl
+              ? collection.bannerImageUrl
+              : 'https://via.placeholder.com/200'
+          }
+          alt="banner"
+        />
+      </div>
+      <div className={style.infoContainer}>
+        <div className={style.midRow}>
+          <img
+            className={style.profileImage}
+            src={
+              collection?.imageUrl
+                ? collection?.imageUrl
+                : 'https://via.placeholder.com'
+            }
+            alt="profile image"
+          />
+        </div>
+        <div className={style.endRow}>
+          <div className={style.socialIconsContainer}>
+            <div className={style.socialIconsWrapper}>
+              <div className={style.socialIconsContent}>
+                <div className={style.socialIcon}>
+                  <CgWebsite />
+                </div>
+                <div className={style.divider} />
+                <div className={style.socialIcon}>
+                  <AiOutlineInstagram />
+                </div>
+                <div className={style.divider} />
+                <div className={style.socialIcon}>
+                  <AiOutlineTwitter />
+                </div>
+                <div className={style.divider} />
+                <div className={style.socialIcon}>
+                  <HiDotsVertical />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={style.midRow}>
+          <div className={style.title}>{collection?.title}</div>
+        </div>
+        <div className={style.midRow}>
+          <div className={style.createdBy}>
+            Created By{' '}
+            <span className="text-[#2081e2]">{collection?.creator}</span>{' '}
+          </div>
+        </div>
+        <div className={style.midRow}>
+          <div className={style.statusContainer}>
+            <div className={style.collectionStat}>
+              <div className={style.statValue}>{nfts.length}</div>
+              <div className={style.statName}>items</div>
+            </div>
+            <div className={style.collectionStat}>
+              <div className={style.statValue}>
+                {collection?.allOwners ? collection.allOwners.length : ''}
+              </div>
+              <div className={style.statName}>owners</div>
+            </div>
+            <div className={style.collectionStat}>
+              <div className={style.statValue}>
+                <img
+                  className={style.ethLogo}
+                  src="https://storage.opensea.io/files/6f8e2979d428180222796ff4a33ab929.svg"
+                  alt="eth"
+                />
+                {collection?.floorPrice}
+              </div>
+              <div className={style.statName}>floor price</div>
+            </div>
+            <div className={style.collectionStat}>
+              <div className={style.statValue}>
+                <img
+                  className={style.ethLogo}
+                  src="https://storage.opensea.io/files/6f8e2979d428180222796ff4a33ab929.svg"
+                  alt="eth"
+                />
+                {collection?.volumeTraded}.5K
+              </div>
+              <div className={style.statName}>volume traded</div>
+            </div>
+          </div>
+        </div>
+        <div className={style.midRow}>
+          <div className={style.description}>{collection?.description}</div>
+        </div>
+      </div>
+
+      {/* NFT Items */}
+
+      <div className="flex flex-wrap">
+        {nfts.map((nftItem, id) => (
+          <NFTCard
+            key={id}
+            nftItem={nftItem}
+            title={collection?.title}
+            listings={listings}
+          />
+        ))}
+      </div>
+    </div>
+  )
 }
 
 export default Collection
