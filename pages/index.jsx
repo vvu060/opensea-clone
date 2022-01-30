@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 
 import Header from '../components/Header'
 import Hero from '../components/Hero'
+import { client } from '../lib/snaityClient'
 
 const style = {
   wrapper: ``,
@@ -20,7 +21,7 @@ export default function Home() {
       const userDoc = {
         _type: 'users',
         _id: address,
-        userName: 'unamed',
+        userName: 'Unnamed',
         walletAddress: address,
       }
       const result = await client.createIfNotExists(userDoc)
