@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
 import Header from '../../components/Header'
+import GeneralDetails from '../../components/nft/GeneralDetails'
 import NFTImage from '../../components/nft/NFTImage'
 
 const style = {
@@ -72,6 +73,9 @@ const Nft = () => {
           <div className={style.topContent}>
             <div className={style.nftImgContainer}>
               <NFTImage selectedNft={selectedNft} />
+            </div>
+            <div className={style.detailsContainer}>
+              <GeneralDetails selectedNft={selectedNft} />
             </div>
           </div>
         </div>
