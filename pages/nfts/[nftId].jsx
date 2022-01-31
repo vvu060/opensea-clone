@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import Header from '../../components/Header'
 import GeneralDetails from '../../components/nft/GeneralDetails'
+import ItemActivity from '../../components/nft/ItemActivity'
 import NFTImage from '../../components/nft/NFTImage'
 
 const style = {
@@ -78,6 +79,7 @@ const Nft = () => {
               <GeneralDetails selectedNft={selectedNft} />
             </div>
           </div>
+          <ItemActivity />
         </div>
       </div>
     </div>
